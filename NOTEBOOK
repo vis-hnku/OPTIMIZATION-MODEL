@@ -1,0 +1,131 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Solving a Business Problem Using Optimization Techniques\n",
+    "\n",
+    "## Problem Statement: Product Mix Optimization\n",
+    "\n",
+    "A factory produces two products: **A** and **B**. Each product requires two raw materials: **Material 1** and **Material 2**. The factory wants to maximize profit, given constraints on the available materials and production capacities.\n",
+    "\n",
+    "**Profit per unit:**\n",
+    "- Product A: $20\n",
+    "- Product B: $30\n",
+    "\n",
+    "**Material requirements per unit:**\n",
+    "- Product A: 3 units of Material 1, 2 units of Material 2\n",
+    "- Product B: 4 units of Material 1, 3 units of Material 2\n",
+    "\n",
+    "**Available resources per week:**\n",
+    "- Material 1: 100 units\n",
+    "- Material 2: 90 units\n",
+    "\n",
+    "**Production constraints:**\n",
+    "- At most 20 units of Product A\n",
+    "- At most 30 units of Product B\n",
+    "\n",
+    "## Objective\n",
+    "Maximize profit by determining how many units of A and B to produce.\n",
+    "\n",
+    "We will use **Linear Programming** and solve with Python's [PuLP](https://coin-or.github.io/pulp/)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "execution_count": 1,
+   "outputs": [],
+   "source": [
+    "# Install PuLP if not already installed\n",
+    "!pip install pulp"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "execution_count": 2,
+   "outputs": [],
+   "source": [
+    "import pulp\n",
+    "\n",
+    "# Define the LP problem\n",
+    "prob = pulp.LpProblem(\"Product_Mix_Optimization\", pulp.LpMaximize)\n",
+    "\n",
+    "# Decision variables: number of units to produce\n",
+    "A = pulp.LpVariable('A', lowBound=0, cat='Integer')\n",
+    "B = pulp.LpVariable('B', lowBound=0, cat='Integer')\n",
+    "\n",
+    "# Objective function: Maximize profit\n",
+    "prob += 20 * A + 30 * B, \"Total Profit\"\n",
+    "\n",
+    "# Constraints\n",
+    "prob += 3 * A + 4 * B <= 100, \"Material 1 constraint\"\n",
+    "prob += 2 * A + 3 * B <= 90, \"Material 2 constraint\"\n",
+    "prob += A <= 20, \"Max units of Product A\"\n",
+    "prob += B <= 30, \"Max units of Product B\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "execution_count": 3,
+   "outputs": [],
+   "source": [
+    "# Solve the problem\n",
+    "prob.solve()\n",
+    "print(f\"Status: {pulp.LpStatus[prob.status]}\")\n",
+    "print(f\"Optimal units of Product A: {A.varValue}\")\n",
+    "print(f\"Optimal units of Product B: {B.varValue}\")\n",
+    "print(f\"Maximum Profit: ${pulp.value(prob.objective)}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "metadata": {},
+   "execution_count": 4,
+   "outputs": [],
+   "source": [
+    "# Display the constraints and their slacks\n",
+    "for name, constraint in prob.constraints.items():\n",
+    "    print(f\"{name}: Slack = {constraint.slack}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Insights & Discussion\n",
+    "\n",
+    "- The solution provides the optimal number of units to produce for each product while respecting all constraints.\n",
+    "- **Material constraints (slacks)** show if any resources are left unused.\n",
+    "- This model can be extended with more products, materials, or complex business rules.\n",
+    "- Linear programming is a powerful technique for operation and production planning, leading to higher profits and better resource utilization."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Next Steps\n",
+    "- Try changing resource limits or profits to see how the solution changes.\n",
+    "- Add more constraints (minimum production, labor, or demand).\n",
+    "- Visualize the feasible region and sensitivity analysis with additional Python libraries."
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "name": "python",
+   "version": "3.x"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
